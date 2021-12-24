@@ -1,54 +1,31 @@
 import Vue from 'vue';
 import App from './App.vue';
 import VueLogger from 'vuejs-logger';
-import * as Keycloak from 'keycloak-js';
 import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css';
-
+import router from './router'
 
 Vue.use(VueLogger);
 Vue.use(Vuetify)
 
-let initOptions = {
-  url: 'http://localhost:8180/auth/',
-  clientId: 'vue-keycloak',
-  realm: 'demorealm',
-  onLoad: 'login-required'
-}
 
-let keycloak = Keycloak(initOptions);
+new Vue({
+  router,
+  el: '#app',
+  render: h => h(App)
+})
 
-keycloak.init({ onLoad: initOptions.onLoad }).then((auth) => {
-  if (!auth) {
-    window.location.reload();
-  } else {
-    Vue.$log.info("Authenticated");
-    localStorage.setItem("jwt", keycloak.token)
-    localStorage.setItem("jwt-refresh-token", keycloak.refreshToken)
+fetch(__dirname + "public/config.json")
+  .then((response) => response.json())
+  .then((config) => {
+    Vue.prototype.$config = config
     new Vue({
-      el: '#app',
-      render: h => h(App, { props: { keycloak: keycloak } })
-    })
+      router,
+      store,
+      render: (h) => h(App)
+    }).$mount("#app")
+  }).catch(() => {
+    Vue.$log.error('Failed to load config');
+  })
 
-  }
 
-
-  //Token Refresh
-  setInterval(() => {
-    keycloak.updateToken(70).then((refreshed) => {
-      if (refreshed) {
-        Vue.$log.info('Token refreshed' + refreshed);
-      } else {
-        Vue.$log.warn('Token not refreshed, valid for '
-          + Math.round(keycloak.tokenParsed.exp + keycloak.timeSkew - new Date().getTime() / 1000) + ' seconds');
-      }
-    }).catch(() => {
-      Vue.$log.error('Failed to refresh token');
-    });
-  }, 6000)
-
-}).catch(() => {
-  Vue.$log.error("Authenticated Failed");
-});
-
-// Vue.prototype.$keycloak = keycloak

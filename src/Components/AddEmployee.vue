@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-btn small @click="showForm()">Add Employeee</v-btn>
-    <v-container v-if="ifShowForm" style="max-width: 50%;">
+    <v-container v-if="ifShowForm" style="max-width: 50%">
       <p>Enter details</p>
       <form @submit="onSubmit" class="add-form">
         <div class="form-control">
@@ -57,7 +57,6 @@ export default {
       console.log("ifShowForm", this.ifShowForm);
     },
     onSubmit(e) {
-      //   e.preventDefault();
       const empDetails = {
         firstName: this.firstName,
         lastName: this.lastName,
