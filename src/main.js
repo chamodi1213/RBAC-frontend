@@ -29,11 +29,11 @@ keycloak.init({ onLoad: initOptions.onLoad }).then((auth) => {
       el: '#app',
       render: h => h(App, { props: { keycloak: keycloak } })
     })
-    
+
   }
 
 
-//Token Refresh
+  //Token Refresh
   setInterval(() => {
     keycloak.updateToken(70).then((refreshed) => {
       if (refreshed) {

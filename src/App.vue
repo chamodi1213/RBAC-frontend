@@ -1,79 +1,69 @@
 <template>
   <div id="app">
     <h1>{{ msg }}</h1>
-    <h2>User: {{keycloak.idTokenParsed.preferred_username}}</h2>
-    <h2>First Name: {{keycloak.idTokenParsed.given_name}}</h2>
-    <h2>Last Name: {{keycloak.idTokenParsed.family_name}}</h2>
-    <div v-if="admin">
-      <h3>Admin</h3>
-    </div>
+    <v-container>
+      <h2>
+        {{ keycloak.idTokenParsed.given_name }}
+        {{ keycloak.idTokenParsed.family_name }}
+      </h2>
+      <p>Username: {{ keycloak.idTokenParsed.preferred_username }}</p>
+    </v-container>
     <div>
       <div>
         <v-btn small @click="keycloak.logout()">Logout</v-btn>
       </div>
       <!-- <button class="btn" @click="keycloak.logout()">Logout</button> -->
     </div>
+    <div>
+      <EmployeeList />
+    </div>
     <div v-if="!viewOnly">
-      <h3> not view only </h3>
+      <h3>This is not view only</h3>
+      <AddEmployee />
     </div>
     <div v-else>
-      <h3> view only </h3>
+      <h3>This is view only</h3>
     </div>
-    <!-- <div id="wrapper">
-      <div class="jwt-token">
-        <h3 style="color: black;">JWT Token</h3>
-        {{keycloak.token}}
-      </div>
-       <div class="jwt-token">
-        <h3 style="color: black;">Info</h3>
-        <ul>
-          <li>clientId: {{keycloak.clientId}}</li>
-          <li>Auth Server Url: {{keycloak.authServerUrl}}</li>
-        </ul>
-      </div>
-    </div> -->
-    <EmployeeList/>
   </div>
 </template>
 
 <script>
-import EmployeeList from './Components/EmployeeList.vue'
-import BackendEventService from './Service/BackendEventService'
-
+import EmployeeList from "./Components/EmployeeList.vue";
+import AddEmployee from "./Components/AddEmployee.vue";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
-    EmployeeList
+    EmployeeList,
+    AddEmployee,
   },
-  props: ['keycloak'],
-  data () {
+  props: ["keycloak"],
+  data() {
     return {
-      msg: 'Welcome to Secured Vue.js App with Keycloak',
+      msg: "Welcome to App Home",
       admin: false,
       viewOnly: false,
-      roles: this.keycloak.realmAccess.roles
-    }
+      roles: this.keycloak.realmAccess.roles,
+    };
   },
   created() {
     // let roles = this.keycloak.realmAccess.roles
-    console.log("keycloak", this.roles) 
-    let allowed = this.roles.some(r=> ['admin', 'manager'].indexOf(r) >= 0)
-    console.log("allowed", allowed)
-    if (allowed){
-      console.log('admin')
+    console.log("keycloak", this.roles);
+    let allowed = this.roles.some((r) => ["admin", "manager"].indexOf(r) >= 0);
+    console.log("allowed", allowed);
+    if (allowed) {
+      console.log("admin");
+    } else {
+      console.log("user");
+      this.viewOnly = true;
     }
-    else{
-      console.log('user')
-      this.viewOnly = true
-    }
-  }
-}
+  },
+};
 </script>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -81,7 +71,8 @@ export default {
   margin-top: 60px;
 }
 
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 
@@ -124,12 +115,12 @@ a {
 }
 
 .btn {
-    color: #fff;
-    background-color: #0088ce;
-    border-color: #00659c;
-    padding: 6px 10px;
-    font-size: 14px;
-    line-height: 1.3333333;
-    border-radius: 1px;
+  color: #fff;
+  background-color: #0088ce;
+  border-color: #00659c;
+  padding: 6px 10px;
+  font-size: 14px;
+  line-height: 1.3333333;
+  border-radius: 1px;
 }
 </style>
